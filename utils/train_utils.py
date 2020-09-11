@@ -99,47 +99,23 @@ def train_model(args, model, dataloaders, criterion, optimizer, bn_optimizer=Non
             inputs, labels = data
             inputs, labels = inputs.to(args.device), labels.to(args.device)
 
-            if args.optim == 'BayesBiNN' and bn_optimizer is not None: #here we only perform optimization for BayesBiNN optimizer
-                bn_optimizer.zero_grad()
-                logits = model.forward(inputs)
-                loss = criterion(logits, labels)
-                loss.backward()
-                bn_optimizer.step()
 
-            if args.optim == 'STE':
-                optimizer.zero_grad()
-                output = model.forward(inputs)
-                loss = criterion(output, labels)
+            optimizer.zero_grad()
+            output = model.forward(inputs)
+            loss = criterion(output, labels)
 
-                optimizer.zero_grad()
-                loss.backward()
+            optimizer.zero_grad()
+            loss.backward()
 
-                for p in list(model.parameters()):
-                    if hasattr(p, 'org'):
-                        p.data.copy_(p.org)
+            for p in list(model.parameters()):
+                if hasattr(p, 'org'):
+                    p.data.copy_(p.org)
 
                 optimizer.step()
 
-                for p in list(model.parameters()):
-                    if hasattr(p, 'org'):
-                        p.org.copy_(p.data.clamp_(-1, 1))
-
-            else:
-                if args.optim == 'BayesBiNN':
-                    def closure():
-                        optimizer.zero_grad()
-                        output = model.forward(inputs)
-                        loss = criterion(output, labels) #
-                        return loss, output
-                else:
-                    def closure():
-                        optimizer.zero_grad()
-                        logits = model.forward(inputs)
-                        loss = criterion(logits, labels)
-                        loss.backward()
-                        return loss, logits
-
-                loss, output = optimizer.step(closure)
+            for p in list(model.parameters()):
+                if hasattr(p, 'org'):
+                    p.org.copy_(p.data.clamp_(-1, 1))
 
             if isinstance(output, list):
                 output = output[0]

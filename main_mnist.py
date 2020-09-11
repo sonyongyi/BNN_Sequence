@@ -130,7 +130,7 @@ def main():
     ])
 
     # Defining the datasets
-    kwargs = {'num_workers': 2, 'pin_memory': True, 'drop_last': True} if args.use_cuda else {}
+    kwargs = {'num_workers': 1, 'pin_memory': True, 'drop_last': True} if args.use_cuda else {}
     train_dataset = datasets.MNIST('./data', train=True, download=True, transform=transform_train)
 
     if args.val_split > 0 and args.val_split < 1:
