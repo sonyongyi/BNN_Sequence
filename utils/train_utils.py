@@ -84,7 +84,7 @@ def train_model(args, model, dataloaders, criterion, optimizer, bn_optimizer=Non
         print('Epoch[%d]:' % epoch)
 
         # learning rate decaly
-        opt_scheduler.step()
+        
         if bn_optimizer is not None:
             bn_scheduler.step()
 
@@ -131,7 +131,9 @@ def train_model(args, model, dataloaders, criterion, optimizer, bn_optimizer=Non
                 train_accuracy = running_train_correct / running_train_samples
                 train_loss = running_train_loss / running_train_samples
                 print('Iteration[%d]: Train Loss: %f   Train Accuracy: %f ' % (i+1, train_loss, train_accuracy))
-
+        
+        
+        opt_scheduler.step()
         train_accuracy = 100 * running_train_correct / len(trainloader.sampler)
         train_loss = running_train_loss / len(trainloader.sampler)
         train_accuracy_hist.append(train_accuracy)
