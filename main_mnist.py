@@ -176,6 +176,8 @@ def main():
         model = MLPBinaryConnect_M2(in_features, out_features, num_units, eps=1e-4, drop_prob = args.drop_prob,  momentum=args.bnmomentum)
     elif args.model == 'MLPBinaryConnect_M3':
         model = MLPBinaryConnect_M3(in_features, out_features, num_units, eps=1e-4, drop_prob = args.drop_prob,  momentum=args.bnmomentum)
+    elif args.model == 'MLPBinaryConnect':
+        model = MLPBinaryConnect(in_features, out_features, num_units, eps=1e-4, drop_prob = args.drop_prob,  momentum=args.bnmomentum)
     else:
         raise ValueError('Please select a network out of {MLPBinaryConnect_M1,M2,M3}')
     print(model)
