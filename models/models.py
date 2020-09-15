@@ -149,7 +149,13 @@ class MLPBinaryConnect_M2(nn.Module):
         self.dropout4 = nn.Dropout(p=drop_prob)
 
         self.seq_data = seq_matrix(11,out_features) #test line
-
+        
+        
+        self.mseq = nn.Linear(num_units, num_units,bias=False)
+        self.mseq.requires_grad_(False)
+        self.mseq.weight.copy_(self.seq_data)
+        
+        
         self.fc1 = BinaryLinear(in_features, num_units, bias=False)
         self.bn1 = nn.BatchNorm1d(num_units, eps=eps, momentum=momentum,affine=batch_affine)
 
@@ -159,9 +165,7 @@ class MLPBinaryConnect_M2(nn.Module):
         self.fc3 = BinaryLinear(num_units, num_units, bias=False)
         self.bn3 = nn.BatchNorm1d(num_units, eps=eps, momentum=momentum,affine=batch_affine)
         
-        self.mseq = nn.Linear(num_units, num_units,bias=False)
-        self.mseq.requires_grad_(False)
-        self.mseq.weight.copy_(self.seq_data)
+        
 
         self.fc4 = BinaryLinear(num_units, out_features, bias=False)
         self.bn4 = nn.BatchNorm1d(out_features, eps=eps, momentum=momentum,affine=batch_affine)
@@ -170,12 +174,12 @@ class MLPBinaryConnect_M2(nn.Module):
     def forward(self, x):
         x = x.view(-1, self.in_features)
         x = self.dropout1(x)
-        x = self.mseq(x)
+        x = self.fc1(x)
         x = F.relu(self.bn1(x))
         x = self.dropout2(x)
 
 
-        x = self.fc2(x)
+        x = self.mseq(x)
         x = F.relu(self.bn2(x))
         x = self.dropout3(x)
 
