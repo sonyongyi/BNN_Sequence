@@ -99,8 +99,9 @@ class MLPBinaryConnect_M1(nn.Module):
         self.bn3 = nn.BatchNorm1d(num_units, eps=eps, momentum=momentum,affine=batch_affine)
         
         self.mseq = BinaryLinear(num_units, out_features,bias=False)
+        self.mseq.requires_grad_(False)
         self.mseq.weight.copy_(self.seq_data)
-        #self.mseq.requires_grad_(False)
+        
         
 
         self.fc4 = BinaryLinear(num_units, out_features, bias=False)

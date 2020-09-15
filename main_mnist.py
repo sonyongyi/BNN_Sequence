@@ -59,6 +59,7 @@ def main():
     # Computation parameters
     parser.add_argument('--no-cuda', action='store_true', default=False,
                         help='disables CUDA training')
+    parser.add_argument('--multi-gpu',action='store_true', default=False, help='enable multi gpu training')
     parser.add_argument('--seed', type=int, default=1, metavar='S',
                         help='random seed (default: 1)')
 
@@ -181,6 +182,10 @@ def main():
     else:
         raise ValueError('Please select a network out of {MLPBinaryConnect_M1,M2,M3}')
     print(model)
+    # for multi GPU
+    if args.multi_gpu
+        model = nn.DataParallel(model)
+    
     model = model.to(args.device)
 
 
