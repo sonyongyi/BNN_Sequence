@@ -148,7 +148,6 @@ class MLPBinaryConnect_M2(nn.Module):
 
         self.dropout4 = nn.Dropout(p=drop_prob)
 
-        self.seq_data = seq_matrix(11,out_features) #test line
         
         
         self.mseq = nn.Linear(num_units, num_units,bias=False)
