@@ -183,7 +183,7 @@ def main():
         raise ValueError('Please select a network out of {MLPBinaryConnect_M1,M2,M3}')
     print(model)
     # for multi GPU
-    if args.multi_gpu
+    if args.multi_gpu :
         model = nn.DataParallel(model)
     
     model = model.to(args.device)
