@@ -148,6 +148,7 @@ class MLPBinaryConnect_M2(nn.Module):
 
         self.dropout4 = nn.Dropout(p=drop_prob)
 
+        self.seq_data = seq_matrix(11,out_features) #test line
 
         self.fc1 = BinaryLinear(in_features, num_units, bias=False)
         self.bn1 = nn.BatchNorm1d(num_units, eps=eps, momentum=momentum,affine=batch_affine)
