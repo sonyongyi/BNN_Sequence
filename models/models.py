@@ -8,7 +8,7 @@ from .binarize_modules import *
 
 def seq_matrix(period,rotate):
     M_seq = np.array(max_len_seq(period)[0])
-    M_seq = np.concatenate([M_seq,M_seq[:1]])
+    #M_seq = np.concatenate([M_seq,M_seq[:1]])
     M_Matrix=np.copy(M_seq)
     for i in range(rotate-1):
         M_seq=np.roll(M_seq,1)
@@ -138,12 +138,12 @@ class MLPBinaryConnect_M2(nn.Module):
     def __init__(self, in_features, out_features, num_units=2048, momentum=0.5, eps=1e-4,drop_prob=0,batch_affine=True):
         super(MLPBinaryConnect_M2, self).__init__()
         self.in_features = in_features
-        self.seq_data = torch. ones(num_units, num_units, requires_grad=False) #test line
         self.dropout1 = nn.Dropout(p=drop_prob)
 
         self.dropout2 = nn.Dropout(p=drop_prob)
-
-
+        
+        self.seq_data = seq_matrix(11,num_units)
+        
         self.dropout3 = nn.Dropout(p=drop_prob)
 
         self.dropout4 = nn.Dropout(p=drop_prob)
@@ -169,7 +169,7 @@ class MLPBinaryConnect_M2(nn.Module):
     def forward(self, x):
         x = x.view(-1, self.in_features)
         x = self.dropout1(x)
-        x = self.fc1(x)
+        x = self.mseq(x)
         x = F.relu(self.bn1(x))
         x = self.dropout2(x)
 
@@ -183,7 +183,7 @@ class MLPBinaryConnect_M2(nn.Module):
         x = F.relu(self.bn3(x))
         x = self.dropout4(x)
 
-        x = self.mseq(x)
+        
 
         x = self.fc4(x)
         x = self.bn4(x)
