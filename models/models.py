@@ -8,7 +8,7 @@ from .binarize_modules import *
 
 def seq_matrix(period,rotate):
     M_seq = np.array(max_len_seq(period)[0])
-    #M_seq = np.concatenate([M_seq,M_seq[:1]])
+    M_seq = np.concatenate([M_seq,M_seq[:1]])
     M_Matrix=np.copy(M_seq)
     for i in range(rotate-1):
         M_seq=np.roll(M_seq,1)
