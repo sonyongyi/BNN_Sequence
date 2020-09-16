@@ -73,14 +73,6 @@ def main():
     parser.add_argument('--lamda-std', type=float, default= 0, metavar='lamda-init',
                         help='linitial std value of the natural parameter lamda(default: 0)')
 
-    parser.add_argument('--temperature', type=float, default= 1e-10, metavar='temperature',
-                        help='temperature for BayesBiNN (default: 1e-8)')
-
-
-    parser.add_argument('--kl-reweight', type=float, default= 1.0, metavar='min temperature',
-                        help='initial temperature for BayesBiNN (default: 1)')
-
-
     parser.add_argument('--bn-affine', type=float, default= 0, metavar='bn-affine',
                         help='whether there is bn learnable parameters, 1: learnable, 0: no (default: 0)')
 

@@ -15,4 +15,4 @@ def save_train_history(args, train_loss, train_acc, val_loss, val_acc, test_loss
     with open(dict_save_path, 'w') as f:
         json.dump({'train_loss': train_loss, 'train_acc': train_acc,
                      'val_loss':   val_loss,   'val_acc':   val_acc,
-                    'test_loss':  test_loss,  'test_acc':  test_acc}, f)
+                    'test_loss':  test_loss,  'test_acc':  test_acc}, f, indent=4)
