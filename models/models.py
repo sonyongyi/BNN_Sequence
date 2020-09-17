@@ -254,7 +254,7 @@ class MLPBinaryConnect_M3(nn.Module):
         return x  # if used NLL loss, the output should be changed to F.log_softmax(x,dim=1),
     
     
-    class VGGBinaryConnect(nn.Module):
+class VGGBinaryConnect(nn.Module):
     """VGG-like net used for Cifar10.
        This model is the MLP architecture used in paper "An empirical study of Binary NN optimization".
        We wirte separately for BCVI optimizer
@@ -325,8 +325,9 @@ class MLPBinaryConnect_M3(nn.Module):
         x = self.bn9(x)
 
         return x  # if used NLL loss, the output should be changed to F.log_softmax(x,dim=1),
-    
-    class VGGBinaryConnect_M1(nn.Module):
+
+
+class VGGBinaryConnect_M1(nn.Module):
     """VGG-like net used for Cifar10.
        This model is the MLP architecture used in paper "An empirical study of Binary NN optimization".
        We wirte separately for BCVI optimizer

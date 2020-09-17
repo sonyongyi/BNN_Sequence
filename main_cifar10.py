@@ -6,6 +6,8 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import torch.nn.parallel
+import torch.backends.cudnn as cudnn
 from torch.utils.data.sampler import SubsetRandomSampler
 from torchvision import datasets, transforms
 
