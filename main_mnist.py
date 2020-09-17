@@ -30,13 +30,13 @@ def main():
     parser.add_argument('--optim', type=str, default='STE', help='Optimizer: STE, or Adam(default : STE)')
     parser.add_argument('--val-split', type=float, default=0.1, help='Random validation set ratio(default : 0.1)')
     parser.add_argument('--criterion', type=str, default='cross-entropy', help='loss funcion: square-hinge or cross-entropy(default : cross-entropy)')
-    parser.add_argument('--batch-size', type=int, default=100, metavar='N',
-                        help='input batch size for training (default: 100)')
+    parser.add_argument('--batch-size', type=int, default=64, metavar='N',
+                        help='input batch size for training (default: 64)')
     parser.add_argument('--test-batch-size', type=int, default=1000, metavar='N',
                         help='input batch size for testing (default: 1000)')
     parser.add_argument('--epochs', type=int, default=10, metavar='N',
                         help='number of epochs to train (default: 10)')
-    parser.add_argument('--lr', type=float, default= 1e-4, metavar='LR',
+    parser.add_argument('--lr', type=float, default= 1e-2, metavar='LR',
                         help='learning rate (default: 1e-4)')
     parser.add_argument('--lr-end', type=float, default= 1e-16, metavar='LR-end',
                         help='learning rate (default: 1e-16)')
