@@ -22,16 +22,16 @@ def timeSince(since):
 
 def main():
     # Training settings
-    parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
+    parser = argparse.ArgumentParser(description='PyTorch Cifar10 Example')
     # Model parameters
-    parser.add_argument('--model', type=str, default='MLPBinaryConnect_M1', help='Model name: MLPBinaryConnect_M1,MLPBinaryConnect_M2,MLPBinaryConnect_M3,(default : MLPBinaryConnect_M1)')
-    parser.add_argument('--bnmomentum', type=float, default=0.15, help='BN layer momentum value(default : 0.15)')
+    parser.add_argument('--model', type=str, default='VGGBinaryConnect', help='Model name: VGGBinaryConnect, VGGBinaryConnect_M1')
+    parser.add_argument('--bnmomentum', type=float, default=0.2, help='BN layer momentum value')
     # Optimization parameters
     parser.add_argument('--optim', type=str, default='STE', help='Optimizer: STE, or Adam(default : STE)')
     parser.add_argument('--val-split', type=float, default=0.1, help='Random validation set ratio(default : 0.1)')
     parser.add_argument('--criterion', type=str, default='cross-entropy', help='loss funcion: square-hinge or cross-entropy(default : cross-entropy)')
-    parser.add_argument('--batch-size', type=int, default=100, metavar='N',
-                        help='input batch size for training (default: 100)')
+    parser.add_argument('--batch-size', type=int, default=64, metavar='N',
+                        help='input batch size for training (default: 64)')
     parser.add_argument('--test-batch-size', type=int, default=1000, metavar='N',
                         help='input batch size for testing (default: 1000)')
     parser.add_argument('--epochs', type=int, default=10, metavar='N',
@@ -83,6 +83,19 @@ def main():
         raise ValueError('The end learning rate should be smaller than starting rate!!')
 
     args.use_cuda = not args.no_cuda and torch.cuda.is_available()
+    ngpus_per_node = torch.cuda.device_count()
+
+    gpu_num = []
+    for i in range(ngpus_per_node):
+        gpu_num.append(i)
+
+    print("Number of GPUs:%d", ngpus_per_node)
+
+    gpu_devices = ','.join([str(id) for id in gpu_num])
+    os.environ["CUDA_VISIBLE_DEVICES"] = gpu_devices
+
+    if ngpus_per_node > 0:
+        print("Use GPU: {} for training".format(gpu_devices))
     torch.manual_seed(args.seed + args.experiment_id)
     np.random.seed(args.seed + args.experiment_id)
 
@@ -109,24 +122,25 @@ def main():
             transforms.RandomCrop(32, padding=4),
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
-            transforms.Normalize((0.1307,), (0.3081,)),
+            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
         ])
     else:
         transform_train = transforms.Compose([
             transforms.ToTensor(),
-            transforms.Normalize((0.1307,), (0.3081,))
+            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
         ])
+
     transform_test = transforms.Compose([
         transforms.ToTensor(),
-        transforms.Normalize((0.1307,), (0.3081,))
+        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
     ])
 
     # Defining the datasets
-    kwargs = {'num_workers': 1, 'pin_memory': True, 'drop_last': True} if args.use_cuda else {}
-    train_dataset = datasets.MNIST('./data', train=True, download=True, transform=transform_train)
+    kwargs = {'num_workers': 1, 'pin_memory': True} if args.use_cuda else {}
+    train_dataset = datasets.CIFAR10('./data', train=True, download=True, transform=transform_train)
 
     if args.val_split > 0 and args.val_split < 1:
-        val_dataset = datasets.MNIST('./data', train=True, download=True, transform=transform_test)
+        val_dataset = datasets.CIFAR10('./data', train=True, download=True, transform=transform_test)
 
         num_train = len(train_dataset)
         indices = list(range(num_train))
@@ -151,7 +165,7 @@ def main():
         val_loader = None
         print('{} train and {} validation datapoints.'.format(len(train_loader.sampler), 0))
 
-    test_dataset = datasets.MNIST('./data', train=False, transform=transform_test)
+    test_dataset = datasets.CIFAR10('./data', train=False, transform=transform_test)
     test_loader = torch.utils.data.DataLoader(
         test_dataset,
         batch_size=args.test_batch_size, shuffle=True, **kwargs
@@ -160,22 +174,25 @@ def main():
 
 
     # Defining the model
-    in_features, out_features = 28*28, 10
-    num_units = 2048
-    if args.model == 'MLPBinaryConnect_M1':
-        model = MLPBinaryConnect_M1(in_features, out_features, num_units, eps=1e-4, drop_prob = args.drop_prob,  momentum=args.bnmomentum)
-    elif args.model == 'MLPBinaryConnect_M2':
-        model = MLPBinaryConnect_M2(in_features, out_features, num_units, eps=1e-4, drop_prob = args.drop_prob,  momentum=args.bnmomentum)
-    elif args.model == 'MLPBinaryConnect_M3':
-        model = MLPBinaryConnect_M3(in_features, out_features, num_units, eps=1e-4, drop_prob = args.drop_prob,  momentum=args.bnmomentum)
-    elif args.model == 'MLPBinaryConnect':
-        model = MLPBinaryConnect(in_features, out_features, num_units, eps=1e-4, drop_prob = args.drop_prob,  momentum=args.bnmomentum)
+    in_channels, out_features = 3, 10
+    if args.model == 'VGGBinaryConnect': #
+        model = VGGBinaryConnect(in_channels, out_features, eps=1e-5, momentum=args.bnmomentum,batch_affine=(args.bn_affine==1))
+    elif args.model == 'VGGBinaryConnect_M1':
+        model = VGGBinaryConnect_M1(in_channels, out_features, eps=1e-5, momentum=args.bnmomentum,
+                                     batch_affine=(args.bn_affine == 1))
+
     else:
-        raise ValueError('Please select a network out of {MLPBinaryConnect_M1,M2,M3}')
+        raise ValueError('Undefined Network')
     print(model)
-    # for multi GPU
+
+    num_parameters = sum([l.nelement() for l in model.parameters()])
+    print("Number of Network parameters: {}".format(num_parameters))
+
+    model = torch.nn.DataParallel(model,device_ids=gpu_num)
     
     model = model.to(args.device)
+
+    cudnn.benchmark = True
 
 
     # Defining the optimizer
