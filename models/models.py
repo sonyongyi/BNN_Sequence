@@ -357,10 +357,6 @@ class VGGBinaryConnect_M1(nn.Module):
         self.bn6 = nn.BatchNorm2d(512, eps=eps, momentum=momentum,affine=batch_affine)
 
         
-        self.mseq = nn.Linear(13, out_features,bias=False)
-        self.mseq.requires_grad_(False)
-        self.mseq.weight.copy_(self.seq_data)
-        
         
         self.fc1 = BinaryLinear(512 * 4 * 4, 1024, bias=False)
         self.bn7 = nn.BatchNorm1d(1024,affine=batch_affine)
@@ -368,8 +364,13 @@ class VGGBinaryConnect_M1(nn.Module):
         self.fc2 = BinaryLinear(1024, 1023, bias=False)
         self.bn8 = nn.BatchNorm1d(1023,affine=batch_affine)
 
-
-        self.fc3 = BinaryLinear(1023, out_features, bias=False)
+        
+        self.seq_data = seq_matrix(11,num_units)
+        self.mseq = nn.Linear(1023, out_features,bias=False)
+        self.mseq.requires_grad_(False)
+        self.mseq.weight.copy_(self.seq_data)
+        
+        #self.fc3 = BinaryLinear(1023, out_features, bias=False)
         self.bn9 = nn.BatchNorm1d(out_features,affine=batch_affine)
 
     def forward(self, x):
@@ -400,7 +401,7 @@ class VGGBinaryConnect_M1(nn.Module):
         x = self.fc2(x)
         x = F.relu(self.bn8(x))
 
-        x = self.fc3(x)
+        x = self.mseq(x)
         x = self.bn9(x)
 
         return x  # if used NLL loss, the output should be changed to F.log_softmax(x,dim=1),
